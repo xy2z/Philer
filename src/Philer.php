@@ -70,6 +70,7 @@
 		 */
 		public function load(string $path) {
 			$this->path = $path;
+			$this->close();
 			unset($this->handle);
 			$this->init();
 		}
