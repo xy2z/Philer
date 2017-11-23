@@ -8,7 +8,7 @@
 
 		private $handle;
 
-		private $options;
+		private $options = array();
 
 		/**
 		 * Constructor
@@ -21,9 +21,9 @@
 			$this->load($path);
 		}
 
-
 		/**
 		 * Get default options
+		 *
 		 */
 		private static function get_default_options() {
 			return array(
@@ -49,6 +49,7 @@
 
 		/**
 		 * Init the file stream
+		 *
 		 */
 		private function init() {
 			if (empty($this->handle) || !is_resource($this->handle)) {
@@ -58,6 +59,7 @@
 
 		/**
 		 * Load a new file
+		 *
 		 * @param  string $path Path to file
 		 */
 		public function load(string $path) {
@@ -68,6 +70,7 @@
 
 		/**
 		 * Write to file
+		 *
 		 */
 		public function write() {
 			$this->init();
@@ -78,6 +81,7 @@
 
 		/**
 		 * Write single variable
+		 *
 		 * @param  mixed $var String, int, array, object, etc.
 		 */
 		private function write_var($var) {
@@ -110,6 +114,7 @@
 
 		/**
 		 * Clear/empty the file.
+		 *
 		 */
 		public function clear() {
 			file_put_contents($this->path, '');
@@ -117,6 +122,7 @@
 
 		/**
 		 * Delete the file
+		 *
 		 */
 		public function delete() {
 			$this->close();
@@ -132,14 +138,21 @@
 			return file_get_contents($this->path);
 		}
 
+		/**
+		 * Close the handle
+		 *
+		 */
 		private function close() {
 			if (is_resource($this->handle)) {
 				fclose($this->handle);
 			}
 		}
 
+		/**
+		 * Destructor
+		 *
+		 */
 		public function __destruct() {
 			$this->close();
 		}
-
 	}
