@@ -39,7 +39,6 @@
 			}
 
 			$this->options->$key = $value;
-			var_dump($this->options);
 		}
 
 
