@@ -33,14 +33,19 @@
 			);
 		}
 
-		public function set_option(string $key, $value) {
-			if (!isset($this->options->$key)) {
-				throw new Exception('Unknown Philer option');
+		/**
+		 * Change an option
+		 *
+		 * @param string $option The option name.
+		 * @param mixed $value   The new value.
+		 */
+		public function set_option(string $option, $value) {
+			if (!isset($this->options->$option)) {
+				throw new \Exception('Unknown Philer option');
 			}
 
-			$this->options->$key = $value;
+			$this->options->$option = $value;
 		}
-
 
 		/**
 		 * Init the file stream
@@ -61,7 +66,6 @@
 			$this->init();
 		}
 
-
 		/**
 		 * Write to file
 		 */
@@ -71,7 +75,6 @@
 				$this->write_var($arg);
 			}
 		}
-
 
 		/**
 		 * Write single variable
@@ -105,14 +108,12 @@
 			fwrite($this->handle, $output);
 		}
 
-
 		/**
 		 * Clear/empty the file.
 		 */
 		public function clear() {
 			file_put_contents($this->path, '');
 		}
-
 
 		/**
 		 * Delete the file
@@ -122,20 +123,14 @@
 			return unlink($this->path);
 		}
 
-
 		/**
-		 * Read the file
-		 * @param  integer $from [description]
-		 * @param  integer $to   [description]
+		 * Read the file content
+		 *
 		 * @return string        File content
 		 */
-		public function read($from = 0, $to = -1) {
+		public function read() {
 			return file_get_contents($this->path);
-			// fseek($this->handle, $from);
-			// clearstatcache();
-			// return fread($this->handle, filesize($this->path));
 		}
-
 
 		private function close() {
 			if (is_resource($this->handle)) {
@@ -143,10 +138,8 @@
 			}
 		}
 
-
 		public function __destruct() {
 			$this->close();
 		}
-
 
 	}
