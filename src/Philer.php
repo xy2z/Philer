@@ -1,7 +1,13 @@
 <?php
 
-	namespace xy2z\Tools;
+	namespace xy2z\Philer;
 
+
+	/**
+	 * Philer class
+	 *
+	 * @link https://packagist.org/packages/xy2z/philer
+	 */
 	class Philer {
 
 		private $path;
