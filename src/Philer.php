@@ -10,11 +10,11 @@
 	 */
 	class Philer {
 
-		private $path;
+		protected $path;
 
-		private $handle;
+		protected $handle;
 
-		private $options = array();
+		protected $options = array();
 
 		/**
 		 * Constructor
@@ -23,7 +23,13 @@
 		 * @param array  $options Philer options, see self::get_default_options().
 		 */
 		public function __construct(string $path, array $options = array()) {
-			$this->options = (object) array_merge(self::get_default_options(), $options);
+			$this->options = (object) $this->get_default_options();
+
+			// Overwrite default options
+			foreach ($options as $key => $value) {
+				$this->set_option($key, $value);
+			}
+
 			$this->load($path);
 		}
 
@@ -31,11 +37,14 @@
 		 * Get default options
 		 *
 		 */
-		private static function get_default_options() {
+		protected static function get_default_options() : array {
 			return array(
 				'prepend_timestamp' => false,
 				'include_trace' => false,
 				'var_dump' => false,
+				'write_prepend' => '',
+				'write_append' => '',
+				'write_separator' => PHP_EOL,
 			);
 		}
 
@@ -47,17 +56,32 @@
 		 */
 		public function set_option(string $option, $value) {
 			if (!isset($this->options->$option)) {
-				throw new \Exception('Unknown Philer option');
+				throw new \Exception('Unknown Philer option: "' . $option . '"');
 			}
 
 			$this->options->$option = $value;
 		}
 
 		/**
+		 * Get option value
+		 *
+		 * @param string $option Option label
+		 *
+		 * @return mixed Option value
+		 */
+		public function get_option(string $option) {
+			if (!isset($this->options->$option)) {
+				throw new \Exception('Unknown Philer option: "' . $option . '"');
+			}
+
+			return $this->options->$option;
+		}
+
+		/**
 		 * Init the file stream
 		 *
 		 */
-		private function init() {
+		protected function init() {
 			if (empty($this->handle) || !is_resource($this->handle)) {
 				$this->handle = fopen($this->path, 'a+');
 			}
@@ -82,16 +106,18 @@
 		public function write() {
 			$this->init();
 			foreach (func_get_args() as $key => $arg) {
-				$this->write_var($arg);
+				fwrite($this->handle, $this->format_write_var($arg));
 			}
 		}
 
 		/**
-		 * Write single variable
+		 * Format the write variable before writing to file.
 		 *
-		 * @param  mixed $var String, int, array, object, etc.
+		 * @param mixed $var Can be any type
+		 *
+		 * @return string The formatted variable.
 		 */
-		private function write_var($var) {
+		protected function format_write_var($var) : string {
 			$output = '';
 
 			if ($this->options->prepend_timestamp) {
@@ -103,12 +129,23 @@
 				$output .= $r[1]['file'] . ':' . $r[1]['line'] . PHP_EOL;
 			}
 
+			if (!empty($this->options->write_prepend)) {
+				$var = $this->options->write_prepend . $var;
+			}
+
+			if (!empty($this->options->write_append)) {
+				$var .= $this->options->write_prepend;
+			}
+
 			if ($this->options->var_dump) {
 				ob_start();
 				var_dump($var);
 				$output .= ob_get_clean();
 			} else {
-				$output .= print_r($var, true) . PHP_EOL;
+				$output .= print_r($var, true);
+				if ($this->options->write_separator !== false) {
+					$output .= $this->options->write_separator;
+				}
 			}
 
 			if ($this->options->include_trace) {
@@ -116,11 +153,11 @@
 				$output .= PHP_EOL;
 			}
 
-			fwrite($this->handle, $output);
+			return $output;
 		}
 
 		/**
-		 * Clear/empty the file.
+		 * Empty the file.
 		 *
 		 */
 		public function clear() {
@@ -149,7 +186,7 @@
 		 * Close the handle
 		 *
 		 */
-		private function close() {
+		protected function close() {
 			if (is_resource($this->handle)) {
 				fclose($this->handle);
 			}
