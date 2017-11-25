@@ -44,4 +44,11 @@ array(3) {
 ```
 
 ## Options
-Coming soon.
+
+| Options | Description | Default value |
+| - | - | - |
+| `prepend_timestamp` | Appends a timestamp before write() | `false` |
+| `var_dump` | var_dump() each variable |  `false` |
+| `include_trace` | Append a trace before each write() | `false` |
+| `write_prepend` | Prepend a string to each write() | `NULL` |
+| `write_append` | Append a string to each write() | `PHP_EOL` |

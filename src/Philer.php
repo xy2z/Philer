@@ -40,11 +40,10 @@
 		protected static function get_default_options() : array {
 			return array(
 				'prepend_timestamp' => false,
-				'include_trace' => false,
 				'var_dump' => false,
+				'include_trace' => false,
 				'write_prepend' => '',
-				'write_append' => '',
-				'write_separator' => PHP_EOL,
+				'write_append' => PHP_EOL,
 			);
 		}
 
@@ -129,22 +128,23 @@
 				$output .= $r[1]['file'] . ':' . $r[1]['line'] . PHP_EOL;
 			}
 
-			if (!empty($this->options->write_prepend)) {
-				$var = $this->options->write_prepend . $var;
-			}
-
-			if (!empty($this->options->write_append)) {
-				$var .= $this->options->write_prepend;
-			}
-
 			if ($this->options->var_dump) {
 				ob_start();
 				var_dump($var);
 				$output .= ob_get_clean();
 			} else {
 				$output .= print_r($var, true);
-				if ($this->options->write_separator !== false) {
-					$output .= $this->options->write_separator;
+			}
+
+			if (!empty($this->options->write_prepend)) {
+				$output = $this->options->write_prepend . $output;
+			}
+
+			if (!empty($this->options->write_append)) {
+				if ($this->options->var_dump && $this->options->write_append === PHP_EOL) {
+					// Don't add PHP_EOL since var_dump() already adds it.
+				} else {
+					$output .= $this->options->write_append;
 				}
 			}
 
