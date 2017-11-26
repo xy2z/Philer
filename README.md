@@ -8,7 +8,7 @@ $ composer require xy2z/philer
 
 ## Basic Usage
 ```php
-use xy2z\Tools\Philer;
+use xy2z\Philer\Philer;
 
 $philer = new Philer('list.txt');
 $philer->write(3.14);
